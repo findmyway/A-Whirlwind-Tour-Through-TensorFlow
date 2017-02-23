@@ -93,11 +93,18 @@ The value of variable can be changed like:
 
 ```python
 # Assign a new value to the variable with `assign()` or a related method.
-W.assign(W + 1.0)
-sess.run(W)
-WW = W.assign_add(1.0)
-sess.run(W)
-sess.run(WW)
+W_update = W.assign(W + 1.0)  # equal to W.assign_add([1])
+sess.run(W)  # array([ 0.30000001], dtype=float32)
+sess.run(W_update)  # array([ 1.29999995], dtype=float32)
+sess.run(W)  # array([ 1.29999995], dtype=float32)
+
+for _ in range(3):
+    sess.run(W_update)
+
+sess.run(W)  # array([ 4.30000019], dtype=float32)
+
+# Notice the type
+type(W_update)  # tensorflow.python.framework.ops.Tensor
 ```
 
 
@@ -117,6 +124,8 @@ init = tf.global_variables_initializer()
 sess.run(init)
 optimizer = tf.train.GradientDescentOptimizer(0.01)
 train = optimizer.minimize(loss)
+
+type(train)  # tensorflow.python.framework.ops.Operation
 
 sess.run(train, {x:[1,2,3,4], y:[0,-1,-2,-3]})
 sess.run([W, b])
