@@ -182,6 +182,67 @@ $$H_{y'}(y) = -\sum_i y'_i \log(y_i)$$
 
 
 
+## Convolution
+Here I take the example in [cs231](http://cs231n.github.io/convolutional-networks/) 
+to demonstrate how to use `tf.nn.conv2d`.
+
+
+![](fig/3.png)
+
+
+```python
+import tensorflow as tf
+import tensorlayer as tl
+import numpy as np
+
+ft = [1, 0, -1, -1, 0, 1, 0, 1, 1,    # w0[:,:,0]
+      0, -1, -1, 0, 0, 0, 1, 1, -1,   # w1[:,:,0]      
+      0, -1, -1, -1, 1, 0, 0, -1, 0,  # w0[:,:,1]
+      -1, 0, 1, 0, -1, 0, 1, -1, -1,  # w1[:,:,1]
+      0, 0, 1, 0, 1, -1, 0, 1, 0,     # w0[:,:,2]
+      0, 1, -1, -1, 1, -1, 0, 1, 0    # w1[:,:,2]
+     ]
+ft = np.array(ft, dtype=np.float32).reshape([3,2,3,3]).transpose([2,3,0,1])
+ft.shape  # (3, 3, 3, 2) [filter_height, filter_width, in_channels, out_channels]
+ft[:,:,1,1]  # array([[-1.,  0.,  1.], [ 0., -1.,  0.], [ 1., -1., -1.]], dtype=float32)
+
+filters = tf.Variable(ft)
+sess.run(tf.global_variables_initializer())
+
+inputs = [[[2,1,2,2,0,0,2,0,2,2,1,0,0,2,1,0,1,0,0,0,2,0,2,2,0],
+          [2,2,0,0,0,1,0,1,1,2,0,0,0,1,1,2,1,0,1,2,2,0,1,0,2],
+          [0,0,0,1,1,2,1,2,0,1,0,2,1,0,1,2,0,0,2,2,0,0,1,1,0]]]
+inputs = np.array(inputs, dtype=np.float32).reshape([1,3,5,5]).transpose([0,2,3,1])
+
+inputs_ph = tf.placeholder(tf.float32, shape=[1,5,5,3])
+res = sess.run(tf.nn.conv2d(inputs_ph, filters, strides=[1,2,2,1], padding='SAME'), 
+          feed_dict={inputs_ph:inputs})
+
+res.shape  #(1, 3, 3, 2) [batch, in_height, in_width, in_channels]
+
+res[:,:,:,0]  #array([[[ 6.,  1.,  0.], [-3.,  1., -1.], [-2.,  5., -2.]]], dtype=float32)
+```
+
+
+## padding
+
+The difference is detailed [here](http://stackoverflow.com/questions/37674306/).
+
+- `SAME`. Pad with zero so that the output size is the same than input size.
+
+- `VALID`. Filter window stays at valid position inside input map. So output size shrinks by filter_size - 1
+
+
+## strides
+
+`strides` specify the stride of filter in both height and width direction.
+
+```python
+strides = [1, stride_in_height, stride_in_width, 1]
+```
+
+
+
 ## Take a deep breath
 
 With all the knowledges above, you can easily understand the
