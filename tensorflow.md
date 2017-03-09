@@ -242,6 +242,11 @@ strides = [1, stride_in_height, stride_in_width, 1]
 ```
 
 
+## backpropagation
+
+See [Backpropagation In Convolutional Neural Networks](http://www.jefkine.com/general/2016/09/05/backpropagation-in-convolutional-neural-networks/)
+
+
 
 ## Take a deep breath
 
